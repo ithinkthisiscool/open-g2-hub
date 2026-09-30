@@ -2,6 +2,9 @@
 
 A standalone, completely offline replacement system for the Even Realities G2 smart glasses companion app. It runs on unmodified stock firmware and provides full control over the native dashboard widgets and the AI microphone stream.
 
+## Why This Instead of MentraOS?
+Unlike MentraOS—which runs a custom ecosystem of third-party applications—**open-g2-hub** communicates directly with the factory layouts built into the glasses. It replaces the official smartphone app entirely, keeping your data local, offline, and free from vendor cloud dependencies.
+
 ## Features & Capabilities
 
 *   **Offline Hub Connection:** Standalone local network management dashboard running on local hosts without vendor cloud dependencies.
