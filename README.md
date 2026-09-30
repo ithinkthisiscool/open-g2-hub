@@ -47,7 +47,7 @@ AA  21  seq  len  total  num  SID  flag  payload...  crc_lo crc_hi
 
 Below are images and animations showing the standalone hub running interface synchronization, custom widget data updates, and native AI microphone captures.
 
-![Interface Setup](assets/dashboard-demo.jpg)
+![Interface Setup](assets/ss.png)
 
 ---
 
