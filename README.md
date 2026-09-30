@@ -2,6 +2,14 @@
 
 A standalone, completely offline replacement system for the Even Realities G2 smart glasses companion app. It runs on unmodified stock firmware and provides full control over the native dashboard widgets and the AI microphone stream.
 
+## Features & Capabilities
+
+*   **Offline Hub Connection:** Standalone local network management dashboard running on local hosts without vendor cloud dependencies.
+*   **Complete Widget Orchestration:** Full read, write, and injection capabilities across all native firmware widgets including News, Tasks, and Calendar.
+*   **Custom AI Routing Engine:** Intercepts native "Hey Even" voice triggers or manual touch inputs and proxies the raw audio stream to custom LLMs (e.g., Anthropic Claude).
+*   **Advanced Assistant Guardrails:** Supports deep system instruction injection, transcription toggle views, customizable listening timeouts, and local tool execution calling (brightness tweaks, status reads, silent mode toggles, and notification routing).
+*   **Multi-Device Synchronization:** Automatically caches and restores individualized configurations, layouts, and assistant presets across different glasses pairs upon BLE reconnect.
+  
 ## Protocol Breakdown
 
 ### 1. Transport & Characteristics
