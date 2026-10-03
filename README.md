@@ -61,5 +61,12 @@ Soon i will upload example python scripts and a full libary repo will be linked 
 I know that a firmware update could wipe all progress so i have things in place to be able to deal with firmware updates.
 If you find anything new or have ideas submit a request and ill take a look.
 
+## 🛠️ Low-Level Bluetooth Protocol
+
+The communication layer of this hub is powered by the **[even-g2-protocol](https://github.com/ithinkthisiscool/even-g2-protocol)** library. 
+
+If you want to view the raw reverse-engineered Service ID (SID) mappings, inspect the custom dual-lens `GlassesSession` connection logic, or use the BLE communication framework independently without the full background gateway server and web interface, see the protocol driver repository.
+
+
 ## License
 MIT License - see LICENSE file for details.
