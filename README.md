@@ -54,5 +54,12 @@ Below are images and animations showing the standalone hub running interface syn
 
 ---
 
+## Work in Progress
+
+This repo is being currently worked on and with the help of claude for reverse engineering the protocols.
+Soon i will upload example python scripts and a full libary repo will be linked as well to control the device.
+I know that a firmware update could wipe all progress so i have things in place to be able to deal with firmware updates.
+If you find anything new or have ideas submit a request and ill take a look.
+
 ## License
 MIT License - see LICENSE file for details.
