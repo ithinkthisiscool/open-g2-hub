@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="g2hub-token" content="{{G2HUB_TOKEN}}">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1C1C1C" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<title>G2 Hub</title>
+<script src="/static/theme.js?v={{G2HUB_VER}}"></script>
+<link rel="stylesheet" href="/static/style.css?v={{G2HUB_VER}}">
+</head>
+<body>
+<a class="skip" href="#sections">Skip to content</a>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M3 13.5h4.2M24.8 13.5H29M13 14.2c1.9-1.3 4.1-1.3 6 0"/><rect x="6.5" y="10.5" width="7.5" height="7.5" rx="3.4"/><rect x="18" y="10.5" width="7.5" height="7.5" rx="3.4"/></svg></div>
+      <div><h1>G2 Hub</h1><div class="tag">Even G2 companion</div></div>
+    </div>
+    <nav id="nav" aria-label="Sections"></nav>
+    <div class="side-foot">
+      <div class="conn" role="status" aria-live="polite"><span class="dot warn" id="dot"></span><span id="connText">Loading…</span></div>
+      <div class="ver" id="hubAddr">hub · local</div>
+    </div>
+  </aside>
+  <main class="main" id="main">
+    <header class="topbar">
+      <button type="button" class="back" id="backBtn" hidden aria-label="Back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span id="backLbl">Back</span></button>
+      <h2 class="pageTitle" id="pageTitle" tabindex="-1">Home</h2>
+      <div class="chips" id="chips"></div>
+    </header>
+    <div class="note err banner" id="hubDown" role="alert" hidden><b>Can't reach the hub.</b> Is it still running? This page retries every few seconds and reloads everything when the hub is back.</div>
+    <div id="sections"></div>
+  </main>
+</div>
+<div id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<!-- Every card (a section element with class card) is moved into place by buildShell() in app.js:
+     data-sec = section, data-page = sub-page within it (optional), data-col = 0 / 1 / full / top,
+     data-status = evidence level (badge shown in Developer mode; "exp" also shows a Beta pill),
+     data-icon = icon key from ICO in app.js, data-beta = hidden unless Beta features are on. -->
+<div id="cards">
+
+  <!-- ===================== HOME ===================== -->
+  <section class="card hero" data-sec="home" data-col="top" data-status="confirmed" id="heroCard">
+    <h2 class="sr-only">Your glasses</h2>
+    <div class="heroGrid">
+      <div class="heroArt" aria-hidden="true">
+        <svg viewBox="0 0 220 96" class="glassesArt"><path class="temple" d="M8 34c6-6 14-8 22-8"/><path class="temple" d="M212 34c-6-6-14-8-22-8"/><rect class="lens" x="28" y="22" width="72" height="54" rx="26"/><rect class="lens" x="120" y="22" width="72" height="54" rx="26"/><path class="bridge" d="M100 40c6-6 14-6 20 0"/><path class="hud" d="M44 46h40M136 46h40" /><path class="hud dim" d="M44 56h24M136 56h30"/></svg>
+      </div>
+      <div class="heroInfo">
+        <div class="heroKicker" id="heroKicker">Your glasses</div>
+        <div class="heroName" id="heroName">Even G2</div>
+        <div class="heroState" id="heroState" role="status" aria-live="polite"><span class="dot warn"></span><span>Checking…</span></div>
+        <div class="heroMeters" id="heroBatt"></div>
+        <div class="row">
+          <button class="secondary small" data-needs="glasses" onclick="glassesRefresh(this)">Refresh</button>
+          <button type="button" class="secondary small" data-go="glasses">Manage glasses</button>
+        </div>
+      </div>
+    </div>
+    <div class="note warn" id="connPanel" role="status" hidden></div>
+    <div class="wiz" id="wizard" hidden></div>
+  </section>
+
+  <section class="card" data-sec="home" data-col="0" data-status="ack" data-icon="sliders">
+    <h2>Quick controls</h2>
+    <div class="sub">Change these on your glasses right away. They are remembered for this pair.</div>
+    <div class="tglGrid" id="tglGrid">
+      <button type="button" class="tgl" data-tgl="silent_mode" data-needs="glasses" aria-pressed="false"><span class="tIco" data-ico="moon"></span><span class="tTxt"><b>Silent</b><span class="tSub">Off</span></span></button>
+      <button type="button" class="tgl" data-tgl="auto_brightness" data-needs="glasses" aria-pressed="false"><span class="tIco" data-ico="sun"></span><span class="tTxt"><b>Auto brightness</b><span class="tSub">Off</span></span></button>
+      <button type="button" class="tgl" data-tgl="head_up" data-needs="glasses" aria-pressed="false"><span class="tIco" data-ico="headup"></span><span class="tTxt"><b>Head-up</b><span class="tSub">Off</span></span></button>
+      <button type="button" class="tgl" data-tgl="live_translate" aria-pressed="false"><span class="tIco" data-ico="translate"></span><span class="tTxt"><b>Translate</b><span class="tSub">Off</span></span></button>
+    </div>
+    <div class="qBright">
+      <label for="qBright"><span>Brightness</span><span class="opt" id="qBrightVal"></span></label>
+      <input type="range" id="qBright" min="1" max="50" value="25" data-needs="glasses" aria-describedby="qBrightHint">
+      <div class="hint" id="qBrightHint">Moving the slider turns auto brightness off.</div>
+    </div>
+  </section>
+
+  <section class="card" data-sec="home" data-col="1" data-status="hub" data-icon="grid">
+    <h2>On your glasses</h2>
+    <div class="sub">What the dashboard shows when you look up.</div>
+    <div class="sumList" id="homeSummary">
+      <button type="button" class="sumRow" data-go="dashboard"><span class="sIco" data-ico="weather"></span><span class="sTxt"><b>Weather</b><span id="hsWx">Not set up yet</span></span><span class="chev" aria-hidden="true"></span></button>
+      <button type="button" class="sumRow" data-go="dashboard"><span class="sIco" data-ico="calendar"></span><span class="sTxt"><b>Next event</b><span id="hsCal">Nothing coming up</span></span><span class="chev" aria-hidden="true"></span></button>
+      <button type="button" class="sumRow" data-go="dashboard"><span class="sIco" data-ico="check"></span><span class="sTxt"><b>Tasks</b><span id="hsTasks">No tasks</span></span><span class="chev" aria-hidden="true"></span></button>
+      <button type="button" class="sumRow" data-go="dashboard"><span class="sIco" data-ico="news"></span><span class="sTxt"><b>News</b><span id="hsNews">Checking…</span></span><span class="chev" aria-hidden="true"></span></button>
+      <button type="button" class="sumRow" data-go="dashboard"><span class="sIco" data-ico="layers"></span><span class="sTxt"><b>Profile</b><span id="hsProf">None</span></span><span class="chev" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <section class="card plainCard" data-sec="home" data-col="full" data-status="hub">
+    <h2>Apps</h2>
+    <div class="tileGrid" id="homeApps"></div>
+  </section>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <section class="card" data-sec="dashboard" data-col="0" data-status="confirmed" data-icon="calendar">
+    <h2>Calendar <span class="sync idle" id="calSync">● idle</span></h2>
+    <div class="sub">Today's and tomorrow's events (up to 8) appear on your glasses. Saved for this pair and kept in sync automatically.</div>
+    <div class="statebar" id="calState" hidden></div>
+    <div id="calSynced"></div>
+    <div id="calEvents"></div>
+    <div class="row">
+      <button class="secondary small addBtn" onclick="calAdd({})">+ Event</button>
+      <button class="secondary small addBtn" onclick="calAdd({minutesFromNow: 15})">+ In 15 min</button>
+      <button class="secondary small addBtn" onclick="calAdd({minutesFromNow: 60})">+ In 1 hour</button>
+      <label class="check inline push"><input type="checkbox" id="calH24" onchange="scheduleCalPush()">24-hour clock</label>
+    </div>
+    <div class="calSyncBox">
+      <h3>Sync a calendar</h3>
+      <label class="fieldLabel" for="calIcsUrl">Calendar link (ICS)</label>
+      <div class="row tight">
+        <input type="text" id="calIcsUrl" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" autocomplete="off" spellcheck="false">
+        <button class="secondary small" id="calSyncNow" onclick="calSyncSave(true)">Sync now</button>
+      </div>
+      <label class="check"><input type="checkbox" id="calIcsOn" onchange="calSyncSave(false)">Keep this calendar synced (every 15 minutes)</label>
+      <div class="hint" id="calSyncLine">Not synced.</div>
+      <details class="more"><summary>Where do I find the link?</summary>
+        <div class="hint"><b>Google Calendar:</b> Settings → your calendar → Integrate calendar → "Secret address in iCal format".<br>
+        <b>Apple iCloud:</b> Calendar app → share the calendar → Public Calendar → copy the link (webcal:// works).<br>
+        <b>Outlook:</b> Settings → Calendar → Shared calendars → Publish a calendar → copy the ICS link.<br>
+        Treat the link like a password: anyone with it can read your calendar. Synced events are read-only here.</div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" data-sec="dashboard" data-col="1" data-status="confirmed" data-icon="check">
+    <h2>Tasks <span class="sync idle" id="qlSync">● idle</span></h2>
+    <div class="sub">Add, tick or edit tasks; the list updates on your glasses a moment after you stop typing.</div>
+    <div class="statebar" id="qlState" hidden></div>
+    <fieldset class="plain" data-needs="glasses">
+      <div id="qlItemsList"></div>
+      <div class="row tight"><button class="secondary addBtn small" onclick="addQuicklistRow('', false)">+ Add task</button></div>
+    </fieldset>
+    <div class="hint" data-offline-hint>Tasks go straight to your glasses. Connect them to edit the list.</div>
+  </section>
+
+  <section class="card" data-sec="dashboard" data-col="0" data-status="confirmed" data-icon="news">
+    <h2>News <span class="sync idle" id="feedSync">● idle</span></h2>
+    <div class="sub">Five stories at a time from the sources you pick. Refreshed when your glasses connect, every 30 minutes, and when you scroll past the last story.</div>
+    <h3>Sources</h3>
+    <div id="feedList" class="feedList"><div class="skel"></div><div class="skel"></div></div>
+    <div class="row tight">
+      <input type="text" id="feedCustom" placeholder="Add an RSS or Atom feed link" aria-label="Custom feed link" onkeydown="if(event.key==='Enter')feedSave(true, document.getElementById('feedAddBtn'))">
+      <button class="secondary small" id="feedAddBtn" onclick="feedSave(true, this)">Add</button>
+    </div>
+    <div class="statebar row" id="hnStatus">
+      <span class="k">Auto-refresh on</span>
+      <span id="hnStatusAge">checking…</span>
+      <span id="hnStatusPushed"></span>
+      <button class="small push" onclick="autoPushNow(this)" id="autoPushBtn" title="Fetch fresh stories now and send them to your glasses (kept for the next connect when offline)">Refresh now</button>
+    </div>
+    <div class="row tight">
+      <button class="secondary small" onclick="fetchHN(this)" id="fetchHNBtn">Preview stories</button>
+      <span class="hint flush">Choose which of the current stories to send.</span>
+    </div>
+    <div id="hnStories"></div>
+    <div id="hnActions" class="row tight" hidden>
+      <button onclick="pushHNNews(this)" id="pushHNBtn" data-needs="glasses">Send selected to glasses</button>
+    </div>
+  </section>
+
+  <section class="card" data-sec="dashboard" data-col="1" data-status="ack" data-icon="weather">
+    <h2>Weather <span class="sync idle" id="wxSync">● idle</span></h2>
+    <div class="sub">Shown in your glasses' status bar. Live weather is free (Open-Meteo) and refreshes every 15 minutes.</div>
+    <div class="statebar" id="wxNow" hidden></div>
+    <div class="formgrid">
+      <div><label for="wxMode">Source</label><select id="wxMode" onchange="wxShowMode()"><option value="auto">Live weather</option><option value="manual">Set by hand</option></select></div>
+      <div><label for="wxUnit">Unit</label><select id="wxUnit"><option value="F">°F</option><option value="C">°C</option></select></div>
+    </div>
+    <div id="wxAutoBox">
+      <label for="wxCity">City <span class="opt">(leave empty to locate automatically)</span></label>
+      <input type="text" id="wxCity" placeholder="e.g. Lisbon">
+    </div>
+    <div id="wxManualBox" hidden>
+      <div class="formgrid">
+        <div><label for="wxTemp">Temperature (°F)</label><input type="number" id="wxTemp" value="72"></div>
+        <div><label for="wxType">Condition</label><select id="wxType"></select></div>
+      </div>
+    </div>
+    <div class="row"><button onclick="wxSave(this)">Save and update</button></div>
+  </section>
+
+  <section class="card" data-sec="dashboard" data-col="1" data-status="hub" id="profCard" data-icon="layers">
+    <h2>Profiles <span class="sync idle" id="profSync">● —</span></h2>
+    <div class="sub">Save your whole dashboard (weather, calendar, tasks, menu, news) under a name, and switch between setups in one tap.</div>
+    <div class="statebar" id="profActive">Active profile: none</div>
+    <div class="profList" id="profList"><div class="skel"></div></div>
+    <label for="profName">Save the current setup as</label>
+    <div class="row tight">
+      <input type="text" id="profName" placeholder="e.g. Work, Weekend" maxlength="40" autocomplete="off" onkeydown="if(event.key==='Enter')profSave($('profSaveBtn'))">
+      <button class="small" id="profSaveBtn" onclick="profSave(this)">Save</button>
+    </div>
+    <details class="sched more" id="profSched">
+      <summary>Switch profiles automatically by time of day</summary>
+      <div class="hint">The hub applies the matching profile about once a minute. Leave all days unticked for every day.</div>
+      <label class="check"><input type="checkbox" id="schedOn">Use the schedule</label>
+      <div id="schedRules"></div>
+      <div class="row tight">
+        <button class="secondary addBtn small" onclick="schedAddRule()">+ Add rule</button>
+        <button class="small push" id="schedSaveBtn" onclick="schedSave(this)">Save schedule</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="card" data-sec="dashboard" data-col="1" data-status="exp" data-beta data-icon="chart">
+    <h2>Stocks <span class="sync idle" id="stSync">● idle</span></h2>
+    <div class="sub">Stock prices on the dashboard (free Yahoo Finance quotes, no key). Not yet confirmed on real glasses: tell us what you see.</div>
+    <label for="stSymbols">Symbols <span class="opt">(up to 8)</span></label>
+    <input type="text" id="stSymbols" placeholder="AAPL, MSFT, NVDA" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button class="secondary small" onclick="stSend(this, false)">Get quotes</button>
+      <button class="small" data-needs="glasses" onclick="stSend(this, true)">Get and send to glasses</button>
+    </div>
+    <div class="statebar" id="stQuotes" hidden></div>
+    <h3>Price chart</h3>
+    <div class="hint flush">Draws a day's price chart for one symbol on your glasses. Replaces whatever app is open.</div>
+    <div class="row tight">
+      <input type="text" id="scSymbol" placeholder="AAPL" aria-label="Symbol for the chart" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')scSend(document.getElementById('scBtn'))">
+      <button class="small" id="scBtn" data-needs="glasses" onclick="scSend(this)">Show chart</button>
+    </div>
+  </section>
+
+  <section class="card" data-sec="dashboard" data-col="0" data-status="exp" data-beta data-icon="heart">
+    <h2>Health <span class="sync idle" id="hlSync">● idle</span></h2>
+    <div class="sub">Your glasses have no health sensors: the dashboard's health card shows the numbers you enter here. Leave a box empty to skip it.</div>
+    <div class="formgrid">
+      <div><label for="hl_steps">Steps</label><input type="number" id="hl_steps" min="0"></div>
+      <div><label for="hl_step_goal">Step goal</label><input type="number" id="hl_step_goal" min="0"></div>
+      <div><label for="hl_calories">Calories (kcal)</label><input type="number" id="hl_calories" min="0"></div>
+      <div><label for="hl_calorie_goal">Calorie goal</label><input type="number" id="hl_calorie_goal" min="0"></div>
+      <div><label for="hl_heart_rate">Heart rate (bpm)</label><input type="number" id="hl_heart_rate" min="20" max="250"></div>
+      <div><label for="hl_heart_rate_avg">Average bpm</label><input type="number" id="hl_heart_rate_avg" min="20" max="250"></div>
+      <div><label for="hl_spo2">SpO2 (%)</label><input type="number" id="hl_spo2" min="50" max="100"></div>
+      <div><label for="hl_spo2_avg">Average SpO2</label><input type="number" id="hl_spo2_avg" min="50" max="100"></div>
+      <div><label for="hl_sleep_minutes">Sleep (minutes)</label><input type="number" id="hl_sleep_minutes" min="0" max="1440"></div>
+      <div><label for="hl_sleep">Sleep score</label><input type="number" id="hl_sleep" min="0" max="100" step="0.1"></div>
+    </div>
+    <label class="check"><input type="checkbox" id="hlShowCard" checked>Show the health card on the dashboard</label>
+    <div class="row"><button class="small" onclick="hlSend(this)">Save and send</button></div>
+  </section>
+
+  <!-- ===================== APPS ===================== -->
+  <section class="card" data-sec="apps" data-page="even-ai" data-status="confirmed" data-icon="spark">
+    <h2>Even AI <span class="sync idle" id="aiPhase">● idle</span></h2>
+    <div class="sub">What happens when you say "Hey Even" or open Even AI from the menu. Changes save automatically. <span id="aiSaved" class="okNote"></span></div>
+    <div class="note warn" id="aiCaps" hidden></div>
+    <label for="aiMode">When Even AI wakes</label>
+    <select id="aiMode" onchange="aiSave()">
+      <option value="off">Off: let the glasses time out</option>
+      <option value="enter">Open only: keep Even AI open, no answer</option>
+      <option value="canned">Auto-reply: show a fixed answer</option>
+      <option value="claude">Claude: answer the question with Claude</option>
+    </select>
+    <label class="check"><input type="checkbox" id="aiListen" onchange="aiSave()">Listen and transcribe the question</label>
+    <label class="check"><input type="checkbox" id="aiShowQ" onchange="aiSave()">Show the question on the glasses</label>
+    <label for="aiListenS">Max listening time <span class="opt">(seconds, 2–30)</span></label>
+    <input type="number" id="aiListenS" min="2" max="30" oninput="aiSave()">
+    <div id="aiCannedBox">
+      <label for="aiCanned">Auto-reply text</label>
+      <textarea id="aiCanned" oninput="aiSave()"></textarea>
+    </div>
+    <div id="aiClaudeBox">
+      <div class="formgrid">
+        <div><label for="aiModel">Claude model</label><select id="aiModel" onchange="aiSave()"></select></div>
+        <div><label for="aiEffort">Effort <span class="opt">(low is fastest)</span></label>
+          <select id="aiEffort" onchange="aiSave()">
+            <option>low</option><option>medium</option><option>high</option><option>xhigh</option><option>max</option>
+          </select></div>
+      </div>
+      <label class="check"><input type="checkbox" id="aiTools" onchange="aiSave()">Let Claude control your glasses (news, tasks, calendar, weather, brightness, silent mode, notifications)</label>
+      <div class="hint dev-only" id="aiToolList"></div>
+      <label for="aiSystem">Instructions for Claude</label>
+      <textarea id="aiSystem" oninput="aiSave()" class="tall"></textarea>
+      <div class="row tight"><button class="secondary small" onclick="aiForget(this)">Forget the conversation</button></div>
+    </div>
+    <details class="more"><summary>Speech-to-text</summary>
+      <div class="formgrid">
+        <div><label for="aiStt">Engine</label>
+          <select id="aiStt" onchange="aiSave()">
+            <option value="deepgram">Deepgram (cloud)</option><option value="local">On this computer (offline)</option>
+          </select></div>
+        <div id="aiSttModelBox"><label for="aiSttModel">Model <span class="opt">(tiny, base, small…)</span></label>
+          <input type="text" id="aiSttModel" placeholder="base" oninput="aiSave()"></div>
+      </div>
+    </details>
+    <h3>Try it</h3>
+    <div class="row tight">
+      <input type="text" id="aiTryQ" placeholder="What's the capital of France?" aria-label="Type a question" onkeydown="if(event.key==='Enter')aiTry(document.getElementById('aiTryBtn'))">
+      <button id="aiTryBtn" onclick="aiTry(this)">Ask</button>
+    </div>
+    <div class="hint flush">Answers appear here, not on the glasses.</div>
+    <div class="statebar" id="aiLive" hidden></div>
+    <h3>Recent questions</h3>
+    <div id="aiHistory" class="aiHist"><div class="skel"></div></div>
+  </section>
+
+  <section class="card" data-sec="apps" data-page="even-ai" data-status="ack" id="voiceCard" data-icon="mic">
+    <h2>Voice commands</h2>
+    <div class="sub">Say "Hey Even" and one of these phrases: your glasses act at once, without asking Claude. Anything else becomes a normal Even AI question.</div>
+    <label class="check"><input type="checkbox" id="aiVoice" onchange="aiSave()">Run voice commands directly</label>
+    <div id="vcList" class="vcList"><div class="skel"></div></div>
+    <h3>Test a command</h3>
+    <div class="hint flush">Type what you would say after "Hey Even". The action runs for real.</div>
+    <div class="row tight">
+      <input type="text" id="vtText" placeholder="e.g. brightness 30" aria-label="Voice command to test" onkeydown="if(event.key==='Enter')voiceTest($('vtBtn'))">
+      <button id="vtBtn" onclick="voiceTest(this)">Run</button>
+    </div>
+    <div class="vtOut" id="vtOut" role="status" aria-live="polite" hidden></div>
+  </section>
+
+  <section class="card" data-sec="apps" data-page="translate" data-status="ack" id="mcCard" data-icon="mic">
+    <h2>Conversation mode <span class="sync idle appSync">● no app open</span></h2>
+    <div class="sub">Listens all the time and shows each phrase, translated, on your glasses. No gesture needed.</div>
+    <div class="lt" id="mcBox">
+      <div class="ltLang">
+        <label for="mcSrc">From</label><select id="mcSrc"></select>
+        <label for="mcDst">to</label><select id="mcDst"></select>
+      </div>
+      <label for="mcSource">Microphone</label>
+      <select id="mcSource">
+        <option value="auto">Automatic (glasses when connected)</option>
+        <option value="glasses">Glasses microphone</option>
+        <option value="device">This computer's microphone</option>
+      </select>
+      <div class="row">
+        <button class="small" id="mcStart" onclick="mcStart(this)">Start listening</button>
+        <button class="secondary small" id="mcStop" onclick="mcStop(this)" disabled>Stop</button>
+        <span class="ltState" id="mcState" role="status" aria-live="polite">Not listening</span>
+      </div>
+      <div class="mcOut" id="mcOut" hidden>
+        <span class="k">Heard</span><span class="mcOrig" id="mcOrig"></span>
+        <span class="k">Translated</span><span class="big" id="mcTrans"></span>
+      </div>
+      <div class="note warn" id="mcHelp" hidden>No microphone available on this computer. Plug one in, or use the glasses microphone while they are connected. <span class="dev-only">(Needs: pip install -e '.[mic]' and sudo apt install libportaudio2.)</span></div>
+    </div>
+  </section>
+
+  <section class="card" data-sec="apps" data-page="translate" data-status="ack" data-icon="translate">
+    <h2>Hands-free translate</h2>
+    <div class="sub">Do the wake gesture on your glasses and speak; the translation appears on the Translate screen. One phrase per gesture.</div>
+    <div class="lt" id="ltBox">
+      <label class="check"><input type="checkbox" id="ltOn" onchange="ltSet(this)">Translate when I use the wake gesture</label>
+      <div class="ltLang">
+        <label for="ltSrc">From</label><select id="ltSrc" onchange="ltLangChanged()"></select>
+        <label for="ltDst">to</label><select id="ltDst" onchange="ltLangChanged()"></select>
+      </div>
+      <div class="ltState" id="ltState" role="status">Loading…</div>
+    </div>
+  </section>
+
+  <section class="card" data-sec="apps" data-page="translate" data-status="ack" data-icon="text">
+    <h2>Type to translate</h2>
+    <div class="sub">Type or paste text: Claude translates it and your glasses show both. Needs an Anthropic key (Settings → AI services).</div>
+    <label for="trText">Text</label>
+    <textarea id="trText" rows="3" placeholder="Type or paste text"></textarea>
+    <div class="ltLang">
+      <label for="trSrc">From</label><select id="trSrc"><option value="EN" selected>English</option><option value="ES">Spanish</option><option value="FR">French</option><option value="DE">German</option><option value="IT">Italian</option><option value="PT">Portuguese</option><option value="NL">Dutch</option><option value="RU">Russian</option><option value="ZH">Chinese (Simplified)</option><option value="JA">Japanese</option><option value="KO">Korean</option><option value="AR">Arabic</option><option value="HI">Hindi</option><option value="TR">Turkish</option></select>
+      <label for="trDst">to</label><select id="trDst"><option value="EN">English</option><option value="ES" selected>Spanish</option><option value="FR">French</option><option value="DE">German</option><option value="IT">Italian</option><option value="PT">Portuguese</option><option value="NL">Dutch</option><option value="RU">Russian</option><option value="ZH">Chinese (Simplified)</option><option value="JA">Japanese</option><option value="KO">Korean</option><option value="AR">Arabic</option><option value="HI">Hindi</option><option value="TR">Turkish</option></select>
+    </div>
+    <div class="statebar" id="trResult" hidden></div>
+    <div class="row">
+      <button class="small" data-needs="glasses" onclick="translateSend(this)">Translate and send</button>
+      <button class="warn small push" data-needs="glasses" onclick="appPost(this, '/api/app/close', {}, 'App closed')">Close Translate</button>
+    </div>
+  </section>
+
+  <section class="card" data-sec="apps" data-page="teleprompter" data-status="ack" data-icon="text">
+    <h2>Teleprompter <span class="sync idle appSync">● no app open</span></h2>
+    <div class="sub">Scrolls your script on the glasses. Type or paste it, or open a text file from this computer.</div>
+    <div class="row tight">
+      <input type="file" id="tpFile" accept=".txt,.md,.text,text/plain,text/markdown" aria-label="Open a text file as the script" hidden>
+      <button type="button" class="secondary small" onclick="$('tpFile').click()">Open text file…</button>
+      <span class="hint flush" id="tpName" role="status">.txt or .md, up to 1 MB. Read here; nothing is uploaded.</span>
+    </div>
+    <label for="tpScript">Script <span class="opt" id="tpCount"></span></label>
+    <textarea id="tpScript" class="tall">Good morning everyone. Thanks for joining. Today I want to walk through what we shipped this week, what is still in progress, and what I need from each of you before Friday.</textarea>
+    <div class="formgrid">
+      <div><label for="tpMode">Scrolling</label><select id="tpMode"><option value="1">Manual (temple swipe)</option><option value="2">Automatic</option><option value="0">Follow my voice</option></select></div>
+      <div><label for="tpCpl">Characters per line</label><input type="number" id="tpCpl" value="28" min="10" max="60"></div>
+    </div>
+    <div class="row">
+      <button class="small" data-needs="glasses" onclick="appPost(this, '/api/app/teleprompter/start', {script: val('tpScript'), mode: parseInt(val('tpMode')), chars_per_line: parseInt(val('tpCpl'))}, 'Teleprompter started')">Start</button>
+      <button class="warn small push" data-needs="glasses" onclick="appPost(this, '/api/app/close', {}, 'App closed')">Close Teleprompter</button>
+    </div>
+    <div class="hint">Use the glasses' own controls to move line by line, or pick Automatic or Follow my voice. Press Start again to restart from the top.</div>
+  </section>
+
+  <section class="card" data-sec="apps" data-page="navigation" data-status="ack" data-icon="nav">
+    <h2>Directions <span class="sync idle appSync">● no app open</span></h2>
+    <div class="sub">Turn-by-turn directions on your glasses. This computer has no GPS, so enter where you start and move on with Next turn.</div>
+    <label for="navFrom">Start <span class="opt">(address or lat,lon)</span></label>
+    <input type="text" id="navFrom" placeholder="e.g. 1 Main St, Springfield" autocomplete="off">
+    <label for="navTo">Destination</label>
+    <input type="text" id="navTo" placeholder="e.g. Central Station" autocomplete="off" onkeydown="if(event.key==='Enter')navRoute($('navRouteBtn'))">
+    <div class="row">
+      <button class="small" id="navRouteBtn" data-needs="glasses" onclick="navRoute(this)">Start directions</button>
+      <button class="secondary small" id="navNextBtn" onclick="navNext(this)" disabled>Next turn</button>
+      <button class="warn small push" data-needs="glasses" onclick="appPost(this, '/api/app/close', {}, 'App closed')">End</button>
+    </div>
+    <div class="navNow" id="navNow" role="status" hidden></div>
+  </section>
+
+  <section class="card" data-sec="apps" data-page="navigation" data-status="ack" data-icon="nav">
+    <h2>Send a single turn</h2>
+    <div class="sub">Show one instruction by hand, without a route.</div>
+    <div class="row tight"><button class="secondary small" data-needs="glasses" onclick="appPost(this, '/api/app/navigation/start', {}, 'Navigation started')">Open Navigation</button></div>
+    <label for="navDir">Turn</label><select id="navDir"></select>
+    <div class="formgrid">
+      <div><label for="navDist">Distance</label><input type="text" id="navDist" value="200 m"></div>
+      <div><label for="navRoad">Road</label><input type="text" id="navRoad" value="Main St"></div>
+      <div><label for="navLeft">Time left</label><input type="text" id="navLeft" value="5 min"></div>
+      <div><label for="navRemain">Distance left</label><input type="text" id="navRemain" value="1.2 km"></div>
+      <div><label for="navEta">Arrival</label><input type="text" id="navEta" value="14:35"></div>
+    </div>
+    <div class="row">
+      <button class="small" data-needs="glasses" onclick="appPost(this, '/api/app/navigation/step', {direction: val('navDir'), distance: val('navDist'), road: val('navRoad'), remaining_time: val('navLeft'), remaining_distance: val('navRemain'), eta: val('navEta')}, 'Turn sent')">Send turn</button>
+      <button class="secondary small" data-needs="glasses" onclick="appPost(this, '/api/app/navigation/event', {kind: 'recalculating'}, 'Recalculating shown')">Recalculating</button>
+      <button class="secondary small" data-needs="glasses" onclick="appPost(this, '/api/app/navigation/event', {kind: 'arrive'}, 'Arrival shown')">Arrived</button>
+    </div>
+  </section>
+
+  <section class="card" data-sec="apps" data-page="evenhub" data-status="exp" id="ehCard" data-icon="puzzle">
+    <h2>EvenHub apps <span class="sync idle" id="ehSync">● idle</span></h2>
+    <div class="sub">Run third-party EvenHub apps (.ehpk) from this computer instead of your phone. Add an app to your glasses' menu, or launch it right away.</div>
+    <div class="ehStatus" id="ehStatus"><span class="skel inline"></span></div>
+    <h3>Installed</h3>
+    <div id="ehApps"><div class="skel"></div></div>
+    <h3>Add an app</h3>
+    <label for="ehFile">Package file (.ehpk)</label>
+    <div class="row tight">
+      <input type="file" id="ehFile" accept=".ehpk">
+      <button class="small" onclick="ehInstallFile(this)">Install</button>
+    </div>
+    <details class="more"><summary>More ways to install</summary>
+      <label for="ehPath">From a folder (app.json + dist/) or a .ehpk path on this computer</label>
+      <div class="row tight">
+        <input type="text" id="ehPath" placeholder="/home/you/my-app">
+        <button class="secondary small" onclick="ehInstallPath(this)">Install</button>
+      </div>
+      <label for="ehStoreId">Look up a store app <span class="opt">(info only; store downloads need the Even app)</span></label>
+      <div class="row tight">
+        <input type="text" id="ehStoreId" placeholder="io.github.someone.app">
+        <button class="secondary small" onclick="ehStoreInfo(this)">Look up</button>
+      </div>
+    </details>
+    <div id="ehMsg" role="status"></div>
+    <div class="dev-only">
+      <h3>Bridge calls <span class="opt">(newest last)</span></h3>
+      <div id="ehLog"></div>
+    </div>
+  </section>
+
+  <section class="card" data-sec="apps" data-page="widgets" data-status="exp" id="cwCard" data-icon="chart">
+    <h2>Custom widgets</h2>
+    <div class="sub">Make your own widget, a graph, a big number or a stock chart, and show it on your glasses. Replaces whatever app is open.</div>
+    <label for="cwType">Type</label>
+    <select id="cwType" onchange="cwType()">
+      <option value="graph">Line graph</option>
+      <option value="metric">Big number</option>
+      <option value="stock">Stock chart</option>
+    </select>
+    <div id="cwGraph">
+      <label for="cwGTitle">Title</label><input type="text" id="cwGTitle" maxlength="14" placeholder="Temp" oninput="cwPreview()">
+      <label for="cwValues">Numbers <span class="opt">(separated by commas, spaces or new lines)</span></label>
+      <textarea id="cwValues" rows="3" placeholder="3, 5, 4, 8, 7, 9, 12" oninput="cwPreview()"></textarea>
+      <label for="cwUnit">Unit <span class="opt">(optional)</span></label><input type="text" id="cwUnit" maxlength="6" placeholder="C" oninput="cwPreview()">
+      <label for="cwUrl">…or a data link <span class="opt">(JSON list, {"values":[…]} or CSV)</span></label>
+      <input type="text" id="cwUrl" placeholder="https://example.com/data.json" autocomplete="off" spellcheck="false">
+      <div class="hint">Used when the numbers box is empty.</div>
+    </div>
+    <div id="cwMetric" hidden>
+      <label for="cwMTitle">Title</label><input type="text" id="cwMTitle" maxlength="24" placeholder="Steps" oninput="cwPreview()">
+      <label for="cwValue">Value</label><input type="text" id="cwValue" maxlength="12" placeholder="8421" oninput="cwPreview()">
+      <label for="cwLabel">Label <span class="opt">(optional)</span></label><input type="text" id="cwLabel" maxlength="30" placeholder="today" oninput="cwPreview()">
+    </div>
+    <div id="cwStock" hidden>
+      <label for="cwSymbol">Symbol</label><input type="text" id="cwSymbol" placeholder="AAPL" autocomplete="off" spellcheck="false">
+      <div class="hint">A day's price chart from Yahoo Finance.</div>
+    </div>
+    <h3>Preview</h3>
+    <canvas id="cwPrev" width="288" height="144" class="cwprev" aria-label="Widget preview (approximate)"></canvas>
+    <div class="row tight"><button class="small" id="cwBtn" data-needs="glasses" onclick="cwSend(this)">Show on glasses</button></div>
+  </section>
+
+  <!-- ===================== GLASSES ===================== -->
+  <section class="card" data-sec="glasses" data-col="0" data-status="confirmed" data-icon="glasses">
+    <h2>My glasses <span class="sync idle" id="devSync">● —</span></h2>
+    <div class="sub">Each pair keeps its own menu, tasks, calendar and Even AI settings, restored automatically when it connects.</div>
+    <div id="devList"><div class="skel"></div></div>
+    <div class="statebar" id="glassStatus" hidden></div>
+    <div class="row">
+      <button class="secondary small" id="devScanBtn" onclick="devScan(this)">Find glasses</button>
+      <button class="secondary small" onclick="wizReopen()">Setup guide</button>
+    </div>
+    <div id="devFound"></div>
+  </section>
+
+  <section class="card" data-sec="glasses" data-col="1" data-status="ack" data-icon="sun">
+    <h2>Display and behaviour <span class="sync idle" id="setSync">● idle</span></h2>
+    <div class="sub">Saved for this pair and applied every time it connects.</div>
+    <label class="check"><input type="checkbox" id="setAuto" onchange="setDirty()">Auto brightness</label>
+    <label for="setBright"><span>Brightness</span> <span id="setBrightVal" class="opt"></span></label>
+    <input type="range" id="setBright" min="1" max="50" value="25" oninput="document.getElementById('setBrightVal').textContent=this.value;setDirty()">
+    <div class="formgrid">
+      <div><label for="setTimeout">Screen turns off after</label><select id="setTimeout" onchange="setDirty()"></select></div>
+      <div><label for="setLang">Glasses language</label><select id="setLang" onchange="setDirty()"></select></div>
+    </div>
+    <label class="check"><input type="checkbox" id="setSilent" onchange="setDirty()">Silent mode (do not disturb)</label>
+    <label class="check"><input type="checkbox" id="setWear" onchange="setDirty()">Turn the display on only when worn</label>
+    <label class="check"><input type="checkbox" id="setHeadUp" onchange="setDirty()">Look up to show the dashboard</label>
+    <label for="setHeadAngle">Head-up angle <span class="opt">(0–60°)</span></label><input type="number" id="setHeadAngle" min="0" max="60" value="30" oninput="setDirty()">
+    <div class="row"><button data-needs="glasses" onclick="setApply(this)">Apply</button></div>
+    <div class="danger">
+      <h3>Restart</h3>
+      <div class="row tight">
+        <button class="warn small" data-needs="glasses" onclick="glassesRestart(this)">Restart glasses</button>
+        <span class="badge exp plain">Beta</span>
+      </div>
+      <div class="hint">The connection drops and the hub reconnects by itself.</div>
+    </div>
+  </section>
+
+  <section class="card" data-sec="glasses" data-col="0" data-status="confirmed" data-icon="menu">
+    <h2>Menu <span class="sync idle" id="menuSync">● idle</span></h2>
+    <div class="sub">The apps in your glasses' menu, in order. Changes reach your glasses a moment after you stop editing.</div>
+    <div class="hint flush">5 to 10 items, including EvenHub apps<span id="menuEhNote"></span>. Your glasses draw each app's own name and icon.</div>
+    <fieldset class="plain" data-needs="glasses">
+      <div id="menuItemsList"></div>
+      <div class="note err" id="menuErr" hidden></div>
+      <div class="row tight"><button class="secondary addBtn small" onclick="addMenuRow(null, true)">+ Add app</button></div>
+    </fieldset>
+    <div class="hint" data-offline-hint>The menu goes straight to your glasses. Connect them to edit it.</div>
+  </section>
+
+  <section class="card" data-sec="glasses" data-col="1" data-status="exp" data-icon="bell">
+    <h2>Notifications <span class="sync idle" id="ntSync">● idle</span></h2>
+    <div class="sub">Notifications are switched on for your glasses every time they connect. Send a test one to see how it looks.</div>
+    <div class="formgrid">
+      <div><label for="ntTitle">Title</label><input type="text" id="ntTitle" value="Hub"></div>
+      <div><label for="ntApp">From (app name)</label><input type="text" id="ntApp" value="Even Realities"></div>
+    </div>
+    <label for="ntMessage">Message</label>
+    <textarea id="ntMessage">Hello from the Linux hub.</textarea>
+    <div class="row">
+      <button data-needs="glasses" onclick="notifySend(this)">Send test notification</button>
+      <button class="secondary small" data-needs="glasses" onclick="notifySetup(this)" title="The hub already does this on every connect">Turn on again</button>
+    </div>
+  </section>
+
+  <section class="card" data-sec="glasses" data-col="0" data-status="exp" data-beta data-icon="watch">
+    <h2>Watchface <span class="sync idle" id="wfSync">● idle</span></h2>
+    <div class="sub">Choose what sits next to the clock on your dashboard. A bad layout can leave the dashboard blank until a good one is applied, so applying asks you to type UPLOAD.</div>
+    <div class="row"><button class="secondary small" data-needs="glasses" onclick="wfRead(this)">Check current layout</button></div>
+    <div class="statebar" id="wfInfo" hidden></div>
+    <div class="formgrid">
+      <div><label for="wfStyle">Style</label><select id="wfStyle"><option value="1">Clock with an extra on each side</option><option value="3">Clock with date and temperature</option></select></div>
+      <div><label for="wfPos">Clock position</label><select id="wfPos"></select></div>
+      <div><label for="wfLeft">Left of the clock</label><select id="wfLeft"></select></div>
+      <div><label for="wfRight">Right of the clock</label><select id="wfRight"></select></div>
+    </div>
+    <div class="formgrid" id="wfStyle3Opts">
+      <div><label class="check"><input type="checkbox" id="wfDate" checked>Show date</label></div>
+      <div><label class="check"><input type="checkbox" id="wfTemp" checked>Show temperature</label></div>
+    </div>
+    <h3>Preview</h3>
+    <div class="wfPreview" id="wfPreview" aria-label="Watchface preview (approximate)"></div>
+    <div class="hint">A guide only. Your glasses draw the real clock.</div>
+    <label for="wfConfirm">Type UPLOAD to confirm</label>
+    <input type="text" id="wfConfirm" autocomplete="off" spellcheck="false" placeholder="UPLOAD">
+    <div class="row"><button class="warn small" data-needs="glasses" onclick="wfUpload(this)">Apply to glasses</button></div>
+  </section>
+
+  <!-- ===================== SETTINGS ===================== -->
+  <section class="card" data-sec="settings" data-col="0" data-status="hub" data-icon="palette">
+    <h2>Appearance</h2>
+    <div class="sub">For this browser only.</div>
+    <label for="themeSel">Theme</label>
+    <select id="themeSel" onchange="themeSet(this.value)"><option value="">Automatic (match system)</option><option value="even-light">Light</option><option value="even-dark">Dark</option><option value="green">Phosphor green (retro)</option><option value="amber">Amber CRT (retro)</option></select>
+  </section>
+
+  <section class="card" data-sec="settings" data-col="0" data-status="hub" data-icon="key">
+    <h2>AI services</h2>
+    <div class="sub">Even AI uses Deepgram to hear your question and Claude (Anthropic) to answer it; Translate uses Claude too. Keys are stored on this computer and never shown again.</div>
+    <dl class="kv" id="keyState"><dt>…</dt><dd></dd></dl>
+    <label for="keyAnthropic">Anthropic API key</label>
+    <input type="password" id="keyAnthropic" autocomplete="off" placeholder="sk-ant-…">
+    <label for="keyDeepgram">Deepgram API key</label>
+    <input type="password" id="keyDeepgram" autocomplete="off">
+    <div class="hint">Leave a field empty to keep the saved key.</div>
+    <div class="row"><button onclick="keysSave(this, 'keyAnthropic', 'keyDeepgram')">Save keys</button></div>
+  </section>
+
+  <section class="card" data-sec="settings" data-col="1" data-status="hub" data-icon="laptop">
+    <h2>This computer <span class="sync idle" id="lidSync">● idle</span></h2>
+    <div class="sub">Applies to the whole hub and saves at once.</div>
+    <label class="check"><input type="checkbox" id="setKeepLid" onchange="setKeepLid()">Stay connected when the lid closes</label>
+    <div class="hint"><b>Off</b> (default): closing the lid puts the laptop to sleep; the hub disconnects your glasses cleanly first and reconnects on wake.<br><b>On</b>: while your glasses are connected, closing the lid does not put the laptop to sleep.</div>
+  </section>
+
+  <section class="card" data-sec="settings" data-col="1" data-status="hub" data-icon="help">
+    <h2>Help and diagnostics</h2>
+    <div class="sub">Check that Bluetooth, your glasses and your keys are in order, or copy a report (without keys or tokens) to share when asking for help.</div>
+    <div class="row tight">
+      <button class="secondary small" onclick="doctorRun(this)">Run a check</button>
+      <button class="secondary small" onclick="diagCopy(this)">Copy report</button>
+    </div>
+    <div id="doctorOut"></div>
+  </section>
+
+  <section class="card" data-sec="settings" data-col="0" data-status="hub" data-icon="flask">
+    <h2>Beta and developer</h2>
+    <div class="sub">Saved in this browser only.</div>
+    <label class="check"><input type="checkbox" id="labsToggle" onchange="labsSet(this.checked)">Show beta features (stocks, health, watchface)</label>
+    <label class="check"><input type="checkbox" id="devToggle" onchange="devSet(this.checked)">Developer mode (protocol tools, live log, evidence badges)</label>
+    <div class="devLinks dev-only">
+      <button type="button" class="sumRow" data-go="developer"><span class="sIco" data-ico="code"></span><span class="sTxt"><b>Developer tools</b><span>Manual pushes and protocol steps</span></span><span class="chev" aria-hidden="true"></span></button>
+      <button type="button" class="sumRow" data-go="log"><span class="sIco" data-ico="list"></span><span class="sTxt"><b>Live log</b><span>Every message to and from your glasses</span></span><span class="chev" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <section class="card" data-sec="settings" data-col="1" data-status="hub" data-icon="info">
+    <h2>About</h2>
+    <div class="sub">G2 Hub runs your Even G2 glasses from this computer, no phone needed.</div>
+    <div class="aboutVer" id="hubVer"></div>
+    <dl class="kv" id="hubKeys"></dl>
+    <details class="more"><summary>Where your data is stored</summary>
+      <dl class="kv" id="hubFiles"><dt>…</dt><dd></dd></dl>
+    </details>
+  </section>
+
+  <!-- ===================== DEVELOPER (Developer mode only) ===================== -->
+  <section class="card" data-sec="developer" data-col="0" data-status="confirmed">
+    <h2>Manual pushes</h2>
+    <div class="sub">Send a widget again right now, bypassing the automatic sync. Uses what is set on the Dashboard.</div>
+    <div class="row">
+      <button class="small" data-needs="glasses" onclick="pushCalendar(this)">Push calendar</button>
+      <button class="small" data-needs="glasses" onclick="pushQuicklist(this)">Push tasks</button>
+      <button class="warn small" data-needs="glasses" onclick="pushMenuForce(this)">Replace menu</button>
+    </div>
+  </section>
+
+  <section class="card" data-sec="developer" data-col="0" data-status="confirmed">
+    <h2>Custom news article</h2>
+    <div class="sub">Push one article with your own title, source and text (replaces the news on the glasses until the next refresh).</div>
+    <label for="testNewsTitle">Title</label>
+    <input type="text" id="testNewsTitle" value="Breaking: hub online">
+    <label for="testNewsSource">Source name</label>
+    <input type="text" id="testNewsSource" value="JarvisWire">
+    <label for="testNewsContent">Content</label>
+    <textarea id="testNewsContent">Testing news injection via custom source.</textarea>
+    <div class="row"><button data-needs="glasses" onclick="pushTestNews(this)">Push to glasses</button></div>
+  </section>
+
+  <section class="card" data-sec="developer" data-col="1" data-status="confirmed">
+    <h2>News FIFO reset</h2>
+    <div class="sub">Sends AppResetClearAllDataMsg (cmdId 13) to wipe the glasses' news slots. Every news push already starts with it; use this when the glasses show stale news from the Even app.</div>
+    <div class="row"><button class="warn small" data-needs="glasses" onclick="resetNews(this)">Reset news FIFO</button></div>
+  </section>
+
+  <section class="card" data-sec="developer" data-col="1" data-status="confirmed">
+    <h2>Even AI manual steps</h2>
+    <div class="sub">SID 0x07, one step at a time. Set Apps → Even AI to "Off" first, or the automatic flow runs too. Say "Hey Even", then within about 3 s press ENTER → ASK → REPLY. (CONFIG is captured but its effect is unconfirmed.)</div>
+    <label for="aiQuestion">Question (ASK, shown as your speech)</label>
+    <input type="text" id="aiQuestion" value="What is on my schedule?">
+    <label for="aiReply">Answer (REPLY)</label>
+    <textarea id="aiReply">Hello from the hub. This answer was injected over SID 0x07.</textarea>
+    <div class="row">
+      <button class="secondary small" data-needs="glasses" onclick="devPost(this, '/api/ai_config', {stream_speed: 32}, 'CONFIG sent')">Config</button>
+      <button class="small" data-needs="glasses" onclick="devPost(this, '/api/ai_ctrl', {status: 2}, 'ENTER sent')">Enter</button>
+      <button class="small" data-needs="glasses" onclick="devPost(this, '/api/ai_ask', {text: val('aiQuestion')}, 'ASK sent')">Ask</button>
+      <button class="small" data-needs="glasses" onclick="devPost(this, '/api/ai_reply', {text: val('aiReply')}, 'REPLY sent')">Reply</button>
+      <button class="small" data-needs="glasses" onclick="devPost(this, '/api/ai_reply', {text: val('aiReply'), chunk_bytes: 40}, 'REPLY streamed')">Reply (stream)</button>
+      <button class="warn small" data-needs="glasses" onclick="devPost(this, '/api/ai_ctrl', {status: 3}, 'EXIT sent')">Exit</button>
+    </div>
+  </section>
+
+  <!-- ===================== LOG (Developer mode only) ===================== -->
+  <section class="card" data-sec="log" data-col="0" data-status="hub">
+    <h2>Live log</h2>
+    <div class="logbar">
+      <label for="logLevel" class="sr-only">Show</label>
+      <select id="logLevel" onchange="logRefilter()">
+        <option value="all">Everything</option>
+        <option value="ok">Successes</option>
+        <option value="warn">Warnings and errors</option>
+        <option value="err">Errors only</option>
+      </select>
+      <input type="text" id="logFilter" placeholder="Filter…" aria-label="Filter log text" oninput="logRefilter()">
+      <label class="check inline"><input type="checkbox" id="logFollow" checked>Follow</label>
+      <button class="secondary small" id="logPauseBtn" onclick="logTogglePause()" aria-pressed="false">Pause</button>
+      <button class="secondary small" onclick="logClear()">Clear</button>
+      <span class="count" id="logCount"></span>
+    </div>
+    <div id="log" role="log" aria-live="off" tabindex="0"></div>
+  </section>
+
+</div>
+
+<script src="/static/app.js?v={{G2HUB_VER}}" defer></script>
+</body>
+</html>
