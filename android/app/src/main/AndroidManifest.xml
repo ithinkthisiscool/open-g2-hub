@@ -1,0 +1,135 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Bluetooth LE: Android 12+ "Nearby devices" (scan is never used for location). -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- Android 11 and older: legacy Bluetooth + location (required by the OS for BLE scans). -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <!-- Location: BLE scans on Android 11 and older; on every version for live weather and
+         turn-by-turn navigation (asked only when the user turns those on). -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- The phone's own calendars for the calendar widget (asked when the user turns it on). -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
+    <!-- Foreground service that keeps the glasses link alive in the background. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- AI providers (Claude / OpenAI-compatible / Gemini / Deepgram), called with the user's own keys. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Live translate from the phone microphone; the service gains the microphone type only while
+         listening (Android 14 rule). The glasses microphone arrives over BLE and needs neither. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <!-- Health Connect (read only, asked when the user picks "From Health Connect" on the health
+         card): today's steps, heart rate and last night's sleep for the glasses' health card. -->
+    <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP" />
+    <application
+        android:label="G2 Hub"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:usesCleartextTraffic="true">
+        <!-- No Android backup / device transfer (res/xml/data_extraction_rules.xml): saved settings
+             hold private calendar links and Keystore-encrypted AI keys cannot be restored elsewhere. -->
+        <!-- cleartext: lets users point an OpenAI-compatible / Whisper profile at a server on their own
+             network (Ollama, LM Studio: http://192.168.x.x). Cloud providers are always https. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- Health Connect (Android 13 and older) opens this to explain why the app reads health
+                 data; it just opens the app (Settings > Privacy explains it). -->
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity>
+        <!-- Health Connect on Android 14+: the "privacy policy" link of the permission screen. Only
+             the system (START_VIEW_PERMISSION_USAGE) may open it. -->
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
+        <!-- flutter_foreground_task service (do not rename). connectedDevice: BLE glasses link;
+             microphone: only while live translate uses the phone mic (lib/hub/translate_live_phone_mic.dart). -->
+        <service
+            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+            android:foregroundServiceType="connectedDevice|microphone"
+            android:stopWithTask="false"
+            android:exported="false" />
+        <!-- Forwards phone notifications to the glasses once the user grants notification access
+             (Settings > Notification access). android/.../G2NotificationListener.kt -->
+        <service
+            android:name=".G2NotificationListener"
+            android:label="G2 Hub"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+        <!-- Report a problem: hands the one diagnostics file in cache/diagnostics to the app the user
+             picks in the share sheet (read-only, not exported; access only via the granted URI).
+             android/.../DiagnosticsBridge.kt -->
+        <provider
+            android:name=".DiagnosticsFileProvider"
+            android:authorities="${applicationId}.diagnostics"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <!-- Is Health Connect installed (health card import)? -->
+        <package android:name="com.google.android.apps.healthdata" />
+        <intent>
+            <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+        </intent>
+        <!-- App names for the notification allow/deny list (launcher apps only). -->
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
+</manifest>
