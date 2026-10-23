@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g2hub"
+dynamic = ["version"]          # read from hub/version.py
+description = "Linux hub for Even Realities G2 smart glasses: local web UI, dashboard, Even AI, EvenHub apps"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    # The g2 protocol library is a SIBLING folder (../g2, distribution name "eveng2-g2"), not on
+    # PyPI. A relative path cannot be expressed portably in pyproject, so ./setup.sh installs it
+    # first with `pip install -e ../g2`. Declared here so the dependency is documented and so pip
+    # sees it as satisfied once setup.sh has run.
+    "eveng2-g2>=1.0",
+    "bleak>=0.22",          # Bluetooth LE client
+    "dbus-fast>=2.0",       # BlueZ fast path and suspend / adapter events
+    "aiohttp>=3.9",         # web server + HTTP calls
+    "lc3py>=1.0",           # LC3 codec for the glasses' microphone (imports as `lc3`)
+    "anthropic>=0.40",      # Claude answers for Even AI
+]
+
+[project.optional-dependencies]
+desktop = ["pywebview>=5.0"]       # desktop app window; also needs system python3-gi + WebKitGTK
+images = ["Pillow>=10"]            # EvenHub image containers
+compression = ["zstandard>=0.22"]  # compressed .ehpk entries on Python < 3.14
+# Offline speech-to-text for Even AI (optional; Deepgram stays the default). Enable with
+#   pip install -e '.[stt-local]'   then pick Speech-to-text: Local in the Even AI card.
+# The Whisper model downloads on first use.
+stt-local = ["faster-whisper>=1.0"]
+# Continuous live translation from the host microphone (USB mic on the Pi / the computer's mic).
+# Needs PortAudio (sudo apt install libportaudio2) and a microphone. Enable: pip install -e '.[mic]'
+mic = ["sounddevice>=0.4"]
+dev = ["pytest>=7"]
+
+# No [project.scripts]: hub/native_hub_gui.py has no main() (it just calls hub.app.run() under
+# `if __name__ == '__main__'`), so `g2hub = "hub.native_hub_gui:main"` would not work. Use ./run.sh.
+# (The desktop launcher installs its own `g2hub` command via desktop/install.sh.)
+
+[tool.setuptools.dynamic]
+version = { attr = "hub.version.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["hub*"]
