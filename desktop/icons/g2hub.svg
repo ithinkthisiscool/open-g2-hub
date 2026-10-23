@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- G2 Hub app icon. Palette from hub/native_hub_gui.py :root:
+       bg #000000, panel #061006, panel2 #0a1a0a, border #1a5c1a, text #4dff7a, bright #a8ffc0.
+       Smart glasses whose lenses show the hub's ">_" prompt. No text elements (renders the same
+       everywhere). Small sizes (16-32 px) use g2hub-small.svg. -->
+  <defs>
+    <radialGradient id="bg" cx="0.5" cy="0.12" r="0.95">
+      <stop offset="0" stop-color="#0d240f"/>
+      <stop offset="0.55" stop-color="#040b04"/>
+      <stop offset="1" stop-color="#000000"/>
+    </radialGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f8f3f"/>
+      <stop offset="1" stop-color="#14461a"/>
+    </linearGradient>
+    <pattern id="scan" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="2" fill="#4dff7a" fill-opacity="0.035"/>
+    </pattern>
+    <filter id="glow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0.30  0 0 0 0 1  0 0 0 0 0.48  0 0 0 0.75 0" result="g"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="sq"><rect x="28" y="28" width="456" height="456" rx="100"/></clipPath>
+  </defs>
+  <rect x="28" y="28" width="456" height="456" rx="100" fill="url(#bg)"/>
+  <rect x="28" y="28" width="456" height="456" rx="100" fill="url(#scan)"/>
+  <rect x="34" y="34" width="444" height="444" rx="94" fill="none" stroke="url(#edge)" stroke-width="12"/>
+  <g filter="url(#glow)">
+    <!-- frame -->
+    <g fill="none" stroke="#4dff7a" stroke-width="24" stroke-linejoin="round" stroke-linecap="round">
+      <rect x="84" y="186" width="160" height="128" rx="40"/>
+      <rect x="268" y="186" width="160" height="128" rx="40"/>
+      <path d="M244 224 Q256 208 268 224"/>
+      <path d="M84 212 L62 196 M428 212 L450 196"/>
+    </g>
+    <!-- ">_" prompt on the lenses -->
+    <path d="M134 218 L170 250 L134 282" fill="none" stroke="#a8ffc0" stroke-width="20"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="310" y="266" width="76" height="20" rx="4" fill="#a8ffc0"/>
+  </g>
+  <!-- status line under the glasses -->
+  <g fill="#4dff7a">
+    <rect x="176" y="372" width="160" height="12" rx="6" fill-opacity="0.35"/>
+    <rect x="176" y="372" width="96" height="12" rx="6" fill-opacity="0.9"/>
+  </g>
+</svg>
